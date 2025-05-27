@@ -1,8 +1,8 @@
 <!DOCTYPE html>
 <html>
 <head>
-    <H1>Prototype - Property Dedupe & Customer linking logic Correction</H1>
     <title>Customer/Loan Linking</title>
+    <h1> prototype - Property Dedupe & Customer linking logic Correction</h1>
     <style>
         body {
             font-family: Arial, sans-serif;
@@ -11,17 +11,17 @@
 
         label {
             font-weight: bold;
-            margin-top: 10px;
             display: block;
+            margin-top: 15px;
         }
 
         select, button {
             margin-top: 5px;
-            padding: 5px;
+            padding: 6px;
         }
 
         .section {
-            margin-top: 20px;
+            margin-top: 25px;
         }
 
         .hidden {
@@ -57,7 +57,7 @@
 </head>
 <body>
 
-    <!-- Customer Type Dropdown -->
+    <!-- Customer Type -->
     <div class="section">
         <label for="customerType">Customer Type</label>
         <select id="customerType">
@@ -79,7 +79,6 @@
             <option value="No">No</option>
         </select>
 
-        <!-- Link Type Dropdown -->
         <div id="linkTypeSection" class="section hidden">
             <label>Link Type</label>
             <select id="linkType" onchange="handleLinkType()">
@@ -102,24 +101,9 @@
                     </tr>
                 </thead>
                 <tbody>
-                    <tr>
-                        <td><input type="checkbox" /></td>
-                        <td>CUST001</td>
-                        <td>John Doe</td>
-                        <td>john@example.com</td>
-                    </tr>
-                    <tr>
-                        <td><input type="checkbox" /></td>
-                        <td>CUST002</td>
-                        <td>Jane Smith</td>
-                        <td>jane@example.com</td>
-                    </tr>
-                    <tr>
-                        <td><input type="checkbox" /></td>
-                        <td>CUST003</td>
-                        <td>Emily Clark</td>
-                        <td>emily@example.com</td>
-                    </tr>
+                    <tr><td><input type="checkbox" /></td><td>CUST001</td><td>John Doe</td><td>john@example.com</td></tr>
+                    <tr><td><input type="checkbox" /></td><td>CUST002</td><td>Jane Smith</td><td>jane@example.com</td></tr>
+                    <tr><td><input type="checkbox" /></td><td>CUST003</td><td>Emily Clark</td><td>emily@example.com</td></tr>
                 </tbody>
             </table>
         </div>
@@ -137,24 +121,9 @@
                     </tr>
                 </thead>
                 <tbody>
-                    <tr>
-                        <td><input type="checkbox" /></td>
-                        <td>LN001</td>
-                        <td>CUST001</td>
-                        <td>₹500,000</td>
-                    </tr>
-                    <tr>
-                        <td><input type="checkbox" /></td>
-                        <td>LN002</td>
-                        <td>CUST002</td>
-                        <td>₹750,000</td>
-                    </tr>
-                    <tr>
-                        <td><input type="checkbox" /></td>
-                        <td>LN003</td>
-                        <td>CUST003</td>
-                        <td>₹300,000</td>
-                    </tr>
+                    <tr><td><input type="checkbox" /></td><td>LN001</td><td>CUST001</td><td>₹500,000</td></tr>
+                    <tr><td><input type="checkbox" /></td><td>LN002</td><td>CUST002</td><td>₹750,000</td></tr>
+                    <tr><td><input type="checkbox" /></td><td>LN003</td><td>CUST003</td><td>₹300,000</td></tr>
                 </tbody>
             </table>
         </div>
@@ -162,7 +131,7 @@
         <button type="button" class="section" onclick="submitLinking()">Submit Linking</button>
     </div>
 
-    <!-- Property Details Table -->
+    <!-- Property Table -->
     <div id="propertyTable" class="table-container hidden">
         <h3>Property Details Linked with Selected Loan(s)</h3>
         <table>
@@ -175,24 +144,9 @@
                 </tr>
             </thead>
             <tbody>
-                <tr>
-                    <td><input type="checkbox" /></td>
-                    <td>PROP001</td>
-                    <td>Mumbai</td>
-                    <td>₹75,00,000</td>
-                </tr>
-                <tr>
-                    <td><input type="checkbox" /></td>
-                    <td>PROP002</td>
-                    <td>Pune</td>
-                    <td>₹50,00,000</td>
-                </tr>
-                <tr>
-                    <td><input type="checkbox" /></td>
-                    <td>PROP003</td>
-                    <td>Delhi</td>
-                    <td>₹95,00,000</td>
-                </tr>
+                <tr><td><input type="checkbox" /></td><td>PROP001</td><td>Mumbai</td><td>₹75,00,000</td></tr>
+                <tr><td><input type="checkbox" /></td><td>PROP002</td><td>Pune</td><td>₹50,00,000</td></tr>
+                <tr><td><input type="checkbox" /></td><td>PROP003</td><td>Delhi</td><td>₹95,00,000</td></tr>
             </tbody>
         </table>
     </div>
@@ -249,41 +203,41 @@
 
         function submitLinking() {
             const linkType = document.getElementById('linkType').value;
-
             if (!linkType) {
                 alert("Please select a link type.");
                 return;
             }
 
-            const customerSelected = [...document.querySelectorAll('#customerTable input[type="checkbox"]')].some(cb => cb.checked);
-            const loanSelected = [...document.querySelectorAll('#loanTable input[type="checkbox"]')].some(cb => cb.checked);
+            const customerChecked = [...document.querySelectorAll('#customerTable input[type="checkbox"]')].some(cb => cb.checked);
+            const loanChecked = [...document.querySelectorAll('#loanTable input[type="checkbox"]')].some(cb => cb.checked);
 
-            if (linkType === 'Customer') {
-                if (!customerSelected) {
-                    alert("Please select at least one customer to link.");
-                    return;
-                }
+            if (linkType === 'Customer' && !customerChecked) {
+                alert("Please select at least one customer to link.");
+                return;
             }
 
             if (linkType === 'Loan') {
-                if (!customerSelected || !loanSelected) {
+                if (!customerChecked || !loanChecked) {
                     alert("Please select at least one customer and one loan to link.");
                     return;
                 }
-            }
-
-            alert(linkType + " linked successfully.");
-
-            if (linkType === 'Loan') {
                 document.getElementById('propertyTable').classList.remove('hidden');
             }
 
+            alert(linkType + " linked successfully.");
             document.getElementById('finalSubmitSection').classList.remove('hidden');
         }
 
         function finalSubmit() {
+            const propertyChecked = [...document.querySelectorAll('#propertyTable input[type="checkbox"]')].some(cb => cb.checked);
+            if (!propertyChecked) {
+                alert("Please select at least one property before final submission.");
+                return;
+            }
+
             document.getElementById('finalMessage').textContent = "Linking done successfully";
         }
     </script>
+
 </body>
 </html>
