@@ -1,8 +1,7 @@
 <!DOCTYPE html>
 <html>
 <head>
-    <title>Customer/Loan Linking</title>
-    <h1> prototype - Property Dedupe & Customer linking logic Correction</h1>
+    <title>Customer Loan Linking</title>
     <style>
         body {
             font-family: Arial, sans-serif;
@@ -20,18 +19,20 @@
             padding: 6px;
         }
 
-        .section {
-            margin-top: 25px;
+        .tables-container {
+            display: flex;
+            gap: 40px;
+            margin-top: 20px;
         }
 
-        .hidden {
-            display: none;
+        .table-wrapper {
+            width: 48%;
         }
 
         table {
+            width: 100%;
             border-collapse: collapse;
             margin-top: 10px;
-            width: 100%;
         }
 
         th, td {
@@ -44,8 +45,12 @@
             background-color: #f2f2f2;
         }
 
-        .table-container {
-            margin-top: 15px;
+        .hidden {
+            display: none;
+        }
+
+        #propertyTable {
+            margin-top: 30px;
         }
 
         #finalMessage {
@@ -53,185 +58,159 @@
             font-weight: bold;
             margin-top: 20px;
         }
+        h5 {
+            color:green;
+
+        }
     </style>
 </head>
 <body>
 
-    <!-- Customer Type -->
-    <div class="section">
-        <label for="customerType">Customer Type</label>
-        <select id="customerType">
-            <option value="">Select customer type</option>
-            <option value="New">New</option>
-            <option value="Existing">Existing</option>
-        </select>
-        <button type="button" onclick="runDedupe()">RUN Dedupe</button>
-    </div>
+    <!-- Customer Type (disabled) -->
+    <label for="customerType">Customer Type</label><h5>BS Comment->  This dropdown will be mandatory to select after run dedupe. if details found than customer type will be existing and if not found then New Customer</h5>
+    <select id="customerType" disabled>
+        <option value="Existing" selected>Existing</option>
+    </select>
+    <button type="button" onclick="runDedupe()">RUN Dedupe</button>
 
-    <p id="message" class="section"></p>
-
-    <!-- Linking Section -->
-    <div id="linkingSection" class="section hidden">
-        <label>Do you want to link the customer/loan?</label>
-        <select id="linkChoice" onchange="handleLinkChoice()">
-            <option value="">Select</option>
-            <option value="Yes">Yes</option>
-            <option value="No">No</option>
-        </select>
-
-        <div id="linkTypeSection" class="section hidden">
-            <label>Link Type</label>
-            <select id="linkType" onchange="handleLinkType()">
-                <option value="">Select</option>
-                <option value="Customer">Customer Linking</option>
-                <option value="Loan">Loan Linking</option>
-            </select>
-        </div>
-
+    <!-- Tables Container -->
+    <div class="tables-container hidden" id="tablesSection">
         <!-- Customer Table -->
-        <div id="customerTable" class="table-container hidden">
-            <h3>Customer List</h3>
+        <div class="table-wrapper">
+            <h3>Customer List</h3><h5>BS Comment-> checker panel team will only be able to view/edit this table. login team has to link the customer ID and complete the dedupe</h5>
             <table>
                 <thead>
                     <tr>
                         <th>Select</th>
                         <th>Customer ID</th>
-                        <th>Customer Name</th>
-                        <th>Customer Type</th>
+                        <th>CustomerName</th>
+                        <th>CustomerType</th>
+                        <th>Matching Parameter</th>
                     </tr>
                 </thead>
-                <tbody>
-                    <tr><td><input type="checkbox" /></td><td>CUST001</td><td>Sohan</td><td>Applicant</td></tr>
-                    <tr><td><input type="checkbox" /></td><td>CUST002</td><td>Rohan</td><td>Co-applicant</td></tr>
-                    <tr><td><input type="checkbox" /></td><td>CUST003</td><td>Mohan</td><td>Applicant</td></tr>
+                <tbody id="customerTableBody">
+                    <tr>
+                        <td><input type="radio" name="customer" /></td>
+                        <td>CUST001</td>
+                        <td>Rahul Das</td>
+                        <td>Applicant</td>
+                        <td>Aadhar, PAN, Mobilenumber</td>
+                    </tr>
+                    <tr>
+                        <td><input type="radio" name="customer" /></td>
+                        <td>CUST002</td>
+                        <td>Mohan Das</td>
+                        <td>Co-applicant</td>
+                        <td>Aadhar,Bank account number</td>
+                    </tr>
+                    <tr>
+                        <td><input type="radio" name="customer" /></td>
+                        <td>CUST003</td>
+                        <td>Sohan Das</td>
+                        <td>Applicant</td>
+                        <td>Aadhar, PAN</td>
+                    </tr>
                 </tbody>
             </table>
         </div>
 
         <!-- Loan Table -->
-        <div id="loanTable" class="table-container hidden">
-            <h3>Loan List</h3>
+        <div class="table-wrapper">
+            <h3>Loan List</h3><h5>BS Comment->  Credit team will have access to view/edit both customer and loan table. they will have option to re-run the dedupe as well. Credit team can change the customer linking and link the loan ID</h5>
             <table>
                 <thead>
                     <tr>
                         <th>Select</th>
                         <th>Loan ID</th>
                         <th>Loan Status</th>
-                        <th>Loan outstanding</th>
+                        <th>Total Outstanding</th>
+                        <th>Matching Parameter</th>
                     </tr>
                 </thead>
-                <tbody>
-                    <tr><td><input type="checkbox" /></td><td>LN001</td><td>Active</td><td>₹500,000</td></tr>
-                    <tr><td><input type="checkbox" /></td><td>LN002</td><td>Active</td><td>₹750,000</td></tr>
-                    <tr><td><input type="checkbox" /></td><td>LN003</td><td>Closed</td><td>₹300,000</td></tr>
+                <tbody id="loanTableBody">
+                    <tr>
+                        <td><input type="radio" name="loan" onclick="showPropertyTable()" /></td>
+                        <td>LN001</td>
+                        <td>Active</td>
+                        <td>₹500,000</td>
+                        <td>Aadhar, PAN, Mobilenumber</td>
+                    </tr>
+                    <tr>
+                        <td><input type="radio" name="loan" onclick="showPropertyTable()" /></td>
+                        <td>LN002</td>
+                        <td>Active</td>
+                        <td>₹750,000</td>
+                        <td>Aadhar,Bank account number</td>
+                    </tr>
+                    <tr>
+                        <td><input type="radio" name="loan" onclick="showPropertyTable()" /></td>
+                        <td>LN003</td>
+                        <td>Closed</td>
+                        <td>₹300,000</td>
+                        <td>Aadhar,Bank account number</td>
+                    </tr>
                 </tbody>
             </table>
         </div>
-
-        <button type="button" class="section" onclick="submitLinking()">Submit Linking</button>
     </div>
 
     <!-- Property Table -->
-    <div id="propertyTable" class="table-container hidden">
-        <h3>Property Details Linked with Selected Loan(s)</h3>
+    <div id="propertyTable" class="hidden">
+        <h3>Property Details Linked with Selected Loan</h3><h5>BS Comment->  once credit linked the loan ID then all property detials linked with that loan ID will be populated and copied in property detials. if multiple property linked then all property will be auto added in property details. </h5>
         <table>
             <thead>
                 <tr>
                     <th>Select</th>
                     <th>Property ID</th>
-                    <th>PropertyAddress</th>
-                    <th>Proeprty Type</th>
+                    <th>ProeprtyAddress</th>
+                    <th>ProeprtyType</th>
                 </tr>
             </thead>
             <tbody>
-                <tr><td><input type="checkbox" /></td><td>PROP001</td><td>Mumbai</td><td>Residentials</td></tr>
-                <tr><td><input type="checkbox" /></td><td>PROP002</td><td>Pune</td><td>Residentials</td></tr>
-                <tr><td><input type="checkbox" /></td><td>PROP003</td><td>Delhi</td><td>Commercial</td></tr>
+                <tr><td><input type="checkbox" checked disabled name="property" /></td><td>PROP001</td><td>Mumbai</td><td>Residentials</td></tr>
+                <tr><td><input type="checkbox" checked disabled name="property" /></td><td>PROP002</td><td>Pune</td><td>Residentials</td></tr>
+                <tr><td><input type="checkbox" checked disabled name="property" /></td><td>PROP003</td><td>Delhi</td><td>Residentials</td></tr>
             </tbody>
         </table>
     </div>
 
     <!-- Final Submit -->
-    <div class="section hidden" id="finalSubmitSection">
+    <div class="hidden" id="finalSubmitSection">
         <button type="button" onclick="finalSubmit()">Final Submit</button>
         <p id="finalMessage"></p>
     </div>
 
     <script>
         function runDedupe() {
-            const type = document.getElementById('customerType').value;
-            const message = document.getElementById('message');
-            const linking = document.getElementById('linkingSection');
-
-            if (type === 'New') {
-                message.textContent = "No records found";
-                linking.classList.add('hidden');
-            } else if (type === 'Existing') {
-                message.textContent = "Records found";
-                linking.classList.remove('hidden');
-            } else {
-                message.textContent = "Please select a valid customer type";
-                linking.classList.add('hidden');
-            }
-
-            document.getElementById('linkTypeSection').classList.add('hidden');
-            document.getElementById('customerTable').classList.add('hidden');
-            document.getElementById('loanTable').classList.add('hidden');
+            document.getElementById('tablesSection').classList.remove('hidden');
             document.getElementById('propertyTable').classList.add('hidden');
             document.getElementById('finalSubmitSection').classList.add('hidden');
             document.getElementById('finalMessage').textContent = "";
         }
 
-        function handleLinkChoice() {
-            const value = document.getElementById('linkChoice').value;
-            const linkType = document.getElementById('linkTypeSection');
-            linkType.classList.toggle('hidden', value !== 'Yes');
-
-            document.getElementById('customerTable').classList.add('hidden');
-            document.getElementById('loanTable').classList.add('hidden');
-            document.getElementById('propertyTable').classList.add('hidden');
-            document.getElementById('finalSubmitSection').classList.add('hidden');
-        }
-
-        function handleLinkType() {
-            const type = document.getElementById('linkType').value;
-            document.getElementById('customerTable').classList.remove('hidden');
-            document.getElementById('loanTable').classList.toggle('hidden', type !== 'Loan');
-            document.getElementById('propertyTable').classList.add('hidden');
-            document.getElementById('finalSubmitSection').classList.add('hidden');
-        }
-
-        function submitLinking() {
-            const linkType = document.getElementById('linkType').value;
-            if (!linkType) {
-                alert("Please select a link type.");
-                return;
-            }
-
-            const customerChecked = [...document.querySelectorAll('#customerTable input[type="checkbox"]')].some(cb => cb.checked);
-            const loanChecked = [...document.querySelectorAll('#loanTable input[type="checkbox"]')].some(cb => cb.checked);
-
-            if (linkType === 'Customer' && !customerChecked) {
-                alert("Please select at least one customer to link.");
-                return;
-            }
-
-            if (linkType === 'Loan') {
-                if (!customerChecked || !loanChecked) {
-                    alert("Please select at least one customer and one loan to link.");
-                    return;
-                }
-                document.getElementById('propertyTable').classList.remove('hidden');
-            }
-
-            alert(linkType + " linked successfully.");
+        function showPropertyTable() {
+            document.getElementById('propertyTable').classList.remove('hidden');
             document.getElementById('finalSubmitSection').classList.remove('hidden');
+            document.getElementById('finalMessage').textContent = "";
         }
 
         function finalSubmit() {
-            const propertyChecked = [...document.querySelectorAll('#propertyTable input[type="checkbox"]')].some(cb => cb.checked);
-            if (!propertyChecked) {
-                alert("Please select at least one property before final submission.");
+            const customerSelected = document.querySelector('input[name="customer"]:checked');
+            const loanSelected = document.querySelector('input[name="loan"]:checked');
+            const propertySelected = document.querySelector('input[name="property"]:checked');
+
+            if (!customerSelected) {
+                alert("Please select a customer.");
+                return;
+            }
+
+            if (!loanSelected) {
+                alert("Please select a loan.");
+                return;
+            }
+
+            if (!propertySelected) {
+                alert("Please select a property.");
                 return;
             }
 
